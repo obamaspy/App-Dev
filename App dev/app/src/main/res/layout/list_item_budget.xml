@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:padding="20dp"
+    android:background="#C5DFE2"
+    android:elevation="4dp"
+    android:layout_margin="8dp">
+
+    <!-- Layout hiển thị thông tin ngân sách -->
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <TextView
+            android:id="@+id/BudgetCategory"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Category"
+            android:padding="5dp"
+            android:textSize="18sp"
+            android:textColor="@android:color/black"
+            android:paddingBottom="4dp" />
+
+        <TextView
+            android:id="@+id/BudgetAmount"
+            android:padding="5dp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Amount"
+            android:textSize="18sp"
+            android:textColor="@color/black"
+            android:paddingBottom="2dp" />
+
+        <TextView
+            android:id="@+id/BudgetDate"
+            android:layout_width="wrap_content"
+            android:padding="5dp"
+            android:layout_height="wrap_content"
+            android:text="Date"
+            android:textSize="18sp"
+            android:textColor="@color/black" />
+    </LinearLayout>
+
+    <!-- Layout chứa 2 nút nằm dọc ở góc trên phải -->
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentRight="true"
+        android:layout_marginEnd="8dp"
+        android:layout_marginRight="8dp"
+        android:layout_marginTop="8dp">
+
+        <ImageButton
+            android:id="@+id/btnEditB"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:contentDescription="Edit Budget"
+            android:padding="8dp"
+            android:src="@android:drawable/ic_menu_edit" />
+
+        <ImageButton
+            android:id="@+id/btnDeleteB"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:padding="8dp"
+            android:src="@android:drawable/ic_delete"
+            android:contentDescription="Delete Budget"
+            android:background="?attr/selectableItemBackgroundBorderless" />
+    </LinearLayout>
+
+</RelativeLayout>

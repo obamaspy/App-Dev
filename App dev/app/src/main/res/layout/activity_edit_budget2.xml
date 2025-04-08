@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:background="#FFFFFF"
+    android:padding="16dp">
+
+
+    <EditText
+        android:id="@+id/edtAmount2"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Please enter the amount you want to spend"
+        android:textSize="15dp"
+        android:textColor="@color/black"
+        android:textStyle="bold"
+        android:inputType="numberDecimal"
+        android:background="#4CAF50"
+        android:textAlignment="center"
+        android:padding="8dp"
+        android:layout_marginTop="10dp"/>
+
+    <!-- Spinner (Dropdown danh mục) -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        android:padding="12dp"
+        android:layout_marginTop="10dp">
+
+        <!-- Dropdown chọn danh mục -->
+        <Spinner
+            android:id="@+id/spinnerCategory2"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="#E0E0E0"
+            android:padding="8dp"/>
+    </LinearLayout>
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"
+        android:background="#F5F5F5"
+        android:gravity="center_vertical"
+        android:orientation="horizontal"
+        android:padding="12dp">
+
+        <!-- Biểu tượng lịch -->
+        <ImageView
+            android:id="@+id/imgCalendar"
+            android:layout_width="30dp"
+            android:layout_height="30dp"
+            android:layout_marginEnd="8dp"
+            android:src="@drawable/calendar" />
+
+        <!-- Ô nhập ngày -->
+        <EditText
+            android:id="@+id/edtDate2"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:clickable="true"
+            android:focusable="false"
+            android:hint="Choose Day"
+            android:padding="8dp"
+            android:textColorHint="#757575"
+            android:textSize="18sp" />
+    </LinearLayout>
+
+    <Button
+        android:id="@+id/btnConfirm2"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Confirm"
+        android:textSize="18sp"
+        android:textColor="#FFFFFF"
+        android:backgroundTint="#9D00FF"
+        android:padding="12dp"
+        android:layout_marginTop="10dp"/>
+
+    <Button
+        android:id="@+id/btnHuy2"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Cancel"
+        android:textSize="18sp"
+        android:textColor="#FFFFFF"
+        android:backgroundTint="#F2082C"
+        android:padding="12dp"
+        android:layout_marginTop="10dp"/>
+</LinearLayout>
