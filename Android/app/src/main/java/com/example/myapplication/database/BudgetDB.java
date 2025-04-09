@@ -19,7 +19,7 @@ import java.util.List;
 public class BudgetDB extends SQLiteOpenHelper {
     private static final String DB_NAME = "campus_expenses";
     private static final String DB_TABLE = "budgets";
-    private static final int DB_VERSION = 20;
+    private static final int DB_VERSION = 27;
 
     // Cột trong database
     private static final String ID_COL = "id";
@@ -92,7 +92,7 @@ public class BudgetDB extends SQLiteOpenHelper {
         return rowsAffected;
     }
 
-    // ✅ Cập nhật ngân sách (theo đối tượng BudgetModel)
+    // Cập nhật ngân sách (theo đối tượng BudgetModel)
     public int updateBudget(BudgetModel budget) {
         return updateBudget(budget.getId(), budget.getName(), budget.getMoney(), budget.getDate());
     }

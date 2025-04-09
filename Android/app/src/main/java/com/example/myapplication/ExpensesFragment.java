@@ -9,10 +9,8 @@ import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ArrayAdapter;
 import android.widget.DatePicker;
 import android.widget.EditText;
-import android.widget.Spinner;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -47,29 +45,42 @@ public class ExpensesFragment extends Fragment {
         dbHelper = new DatabaseHelper(requireContext());
         binding.recyclerViewExpenses.setLayoutManager(new LinearLayoutManager(requireContext()));
 
-        // Setup Spinner with English options directly in code
-        List<String> descriptionOptions = new ArrayList<>();
-        descriptionOptions.add("Food");
-        descriptionOptions.add("Shopping");
-        descriptionOptions.add("Utilities");
-        descriptionOptions.add("Living");
-        descriptionOptions.add("Transport");
-        descriptionOptions.add("Others");
-
-        ArrayAdapter<String> adapterDesc = new ArrayAdapter<>(
-                requireContext(),
-                android.R.layout.simple_spinner_item,
-                descriptionOptions
-        );
-        adapterDesc.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        binding.spinnerDescription.setAdapter(adapterDesc);
-
-        // Setup Date Picker
+        // Thêm sự kiện click cho edtDate để hiện DatePicker
         binding.edtDate.setOnClickListener(v -> showDatePicker());
 
         loadExpenses();
 
-        binding.btnAddExpense.setOnClickListener(v -> addExpense());
+        binding.btnAddExpense.setOnClickListener(v -> {
+            String description = binding.edtDescription.getText().toString().trim();
+            String amountStr = binding.edtAmount.getText().toString().trim();
+            String date = binding.edtDate.getText().toString().trim();
+            if (TextUtils.isEmpty(description) || TextUtils.isEmpty(amountStr) || TextUtils.isEmpty(date)) {
+                Toast.makeText(requireContext(), "Please fill in all fields", Toast.LENGTH_SHORT).show();
+                return;
+            }
+            double amount = Double.parseDouble(amountStr);
+
+            SharedPreferences prefs = requireContext().getSharedPreferences("BudgetPrefs", Context.MODE_PRIVATE);
+            double currentBudget = prefs.getFloat("totalBudget", 0);
+
+            if (amount > currentBudget) {
+                Toast.makeText(requireContext(), "The amount you spend is greater than the balance in your budget.", Toast.LENGTH_SHORT).show();
+                return;
+            }
+
+            if (currentBudget <= 15 && amount < 15) {
+                new AlertDialog.Builder(requireContext())
+                        .setTitle("Warning")
+                        .setMessage("You are running low on budget, are you sure you can spend this money?")
+                        .setPositiveButton("Yes", (dialog, which) -> {
+                            processExpense(description, amount, date);
+                        })
+                        .setNegativeButton("No", (dialog, which) -> dialog.dismiss())
+                        .show();
+            } else {
+                processExpense(description, amount, date);
+            }
+        });
     }
 
     private void showDatePicker() {
@@ -89,40 +100,6 @@ public class ExpensesFragment extends Fragment {
         dialog.show();
     }
 
-    private void addExpense() {
-        String description = binding.spinnerDescription.getSelectedItem().toString();
-        String amountStr = binding.edtAmount.getText().toString().trim();
-        String date = binding.edtDate.getText().toString().trim();
-
-        if (TextUtils.isEmpty(amountStr) || TextUtils.isEmpty(date)) {
-            Toast.makeText(requireContext(), "Please fill in all fields", Toast.LENGTH_SHORT).show();
-            return;
-        }
-
-        double amount = Double.parseDouble(amountStr);
-
-        SharedPreferences prefs = requireContext().getSharedPreferences("BudgetPrefs", Context.MODE_PRIVATE);
-        double currentBudget = prefs.getFloat("totalBudget", 0);
-
-        if (amount > currentBudget) {
-            Toast.makeText(requireContext(), "The amount you spend is greater than the balance in your budget.", Toast.LENGTH_SHORT).show();
-            return;
-        }
-
-        if (currentBudget <= 15 && amount < 15) {
-            new AlertDialog.Builder(requireContext())
-                    .setTitle("Warning")
-                    .setMessage("You are running low on budget, are you sure you can spend this money?")
-                    .setPositiveButton("Yes", (dialog, which) -> {
-                        processExpense(description, amount, date);
-                    })
-                    .setNegativeButton("No", (dialog, which) -> dialog.dismiss())
-                    .show();
-        } else {
-            processExpense(description, amount, date);
-        }
-    }
-
     private void processExpense(String description, double amount, String date) {
         SharedPreferences prefs = requireContext().getSharedPreferences("BudgetPrefs", Context.MODE_PRIVATE);
         double currentBudget = prefs.getFloat("totalBudget", 0);
@@ -133,7 +110,7 @@ public class ExpensesFragment extends Fragment {
         Expense expense = new Expense(0, description, amount, date);
         dbHelper.addExpense(expense);
 
-        binding.spinnerDescription.setSelection(0);
+        binding.edtDescription.setText("");
         binding.edtAmount.setText("");
         binding.edtDate.setText("");
 
@@ -176,19 +153,19 @@ public class ExpensesFragment extends Fragment {
         View dialogView = getLayoutInflater().inflate(R.layout.dialog_edit_expense, null);
         EditText edtEditDescription = dialogView.findViewById(R.id.edtEditDescription);
         EditText edtEditAmount = dialogView.findViewById(R.id.edtEditAmount);
-        EditText edtEditDate = dialogView.findViewById(R.id.edtEditDate);
+        EditText edtDate = dialogView.findViewById(R.id.edtDate);
 
         edtEditDescription.setText(expense.getDescription());
         edtEditAmount.setText(String.valueOf(expense.getAmount()));
-        edtEditDate.setText(expense.getDate());
+        edtDate.setText(expense.getDate());
 
-        edtEditDate.setOnClickListener(v -> {
+        edtDate.setOnClickListener(v -> {
             final Calendar calendar = Calendar.getInstance();
             DatePickerDialog datePickerDialog = new DatePickerDialog(
                     requireContext(),
                     (view, year, month, dayOfMonth) -> {
                         String selectedDate = String.format("%04d-%02d-%02d", year, month + 1, dayOfMonth);
-                        edtEditDate.setText(selectedDate);
+                        edtDate.setText(selectedDate);
                     },
                     calendar.get(Calendar.YEAR),
                     calendar.get(Calendar.MONTH),
@@ -201,7 +178,7 @@ public class ExpensesFragment extends Fragment {
         builder.setPositiveButton("Save", (dialog, which) -> {
             String newDescription = edtEditDescription.getText().toString().trim();
             String newAmountStr = edtEditAmount.getText().toString().trim();
-            String newDate = edtEditDate.getText().toString().trim();
+            String newDate = edtDate.getText().toString().trim();
             if (TextUtils.isEmpty(newDescription) || TextUtils.isEmpty(newAmountStr) || TextUtils.isEmpty(newDate)) {
                 Toast.makeText(requireContext(), "All fields required", Toast.LENGTH_SHORT).show();
                 return;

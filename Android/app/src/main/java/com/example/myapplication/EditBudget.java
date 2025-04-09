@@ -5,10 +5,8 @@ import android.content.ContentValues;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
-import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
-import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.Spinner;
 import android.widget.Toast;
@@ -31,7 +29,7 @@ public class EditBudget extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_edit_budget);
+        setContentView(R.layout.activity_add_budget);
 
         initViews();
         setupSpinner();
@@ -57,7 +55,7 @@ public class EditBudget extends AppCompatActivity {
     }
 
     private void setupSpinner() {
-        String[] categories = {"Salary", "Allowance", "Bonus"};
+        String[] categories = {"Family support", "Scholarship", "Overtime pay"};
         ArrayAdapter<String> adapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_dropdown_item, categories);
         spinnerCategory.setAdapter(adapter);
     }

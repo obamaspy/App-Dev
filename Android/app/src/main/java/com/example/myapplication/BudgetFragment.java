@@ -1,8 +1,8 @@
 package com.example.myapplication;
 
 import android.app.AlertDialog;
+import android.app.DatePickerDialog;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
@@ -22,13 +22,14 @@ import com.example.myapplication.model.BudgetModel;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.List;
 import java.util.Locale;
 
 public class BudgetFragment extends Fragment {
 
     TextView tvBudgetAmount;
-    Button btnAddBudget, btnDeleteBudget, btnUpdate;
+    Button btnAddBudget, btnDeleteBudget;
     RecyclerView recyclerBudget;
     BudgetAdapter budgetAdapter;
     List<BudgetModel> budgetList;
@@ -43,7 +44,6 @@ public class BudgetFragment extends Fragment {
         tvBudgetAmount = view.findViewById(R.id.tvBudgetAmount);
         btnAddBudget = view.findViewById(R.id.btnAddBudget);
         btnDeleteBudget = view.findViewById(R.id.btnDeleteBudget);
-        btnUpdate = view.findViewById(R.id.btnUpdate);
         recyclerBudget = view.findViewById(R.id.recyclerBudget);
 
         budgetDB = new BudgetDB(requireContext());
@@ -86,30 +86,60 @@ public class BudgetFragment extends Fragment {
             Toast.makeText(getContext(), "All budgets deleted.", Toast.LENGTH_SHORT).show();
         });
 
-        btnUpdate.setOnClickListener(v -> {
-            loadBudgets();
-            Toast.makeText(getContext(), "Budget updated.", Toast.LENGTH_SHORT).show();
-        });
-
         return view;
     }
 
     private void showEditDialog(BudgetModel budget) {
         View dialogView = LayoutInflater.from(getContext()).inflate(R.layout.dialog_edit_budget, null);
-        EditText edtCategory = dialogView.findViewById(R.id.edtEditCategory);
+        Spinner spinnerCategory = dialogView.findViewById(R.id.spinnerCategory);
         EditText edtAmount = dialogView.findViewById(R.id.edtEditAmount);
-        EditText edtDate = dialogView.findViewById(R.id.edtEditDate);
+        EditText edtDate = dialogView.findViewById(R.id.edtDate);
+        ImageView imgCalendar = dialogView.findViewById(R.id.imgCalendar);
 
-        edtCategory.setText(budget.getName());
+        // Thiết lập dữ liệu cho Spinner
+        String[] categories = {"Family support", "Scholarship", "Overtime pay"};
+        ArrayAdapter<String> adapter = new ArrayAdapter<>(requireContext(), android.R.layout.simple_spinner_item, categories);
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        spinnerCategory.setAdapter(adapter);
+
+        // Chọn vị trí danh mục hiện tại
+        int selectedIndex = 0;
+        for (int i = 0; i < categories.length; i++) {
+            if (categories[i].equalsIgnoreCase(budget.getName())) {
+                selectedIndex = i;
+                break;
+            }
+        }
+        spinnerCategory.setSelection(selectedIndex);
+
         edtAmount.setText(String.valueOf(budget.getMoney()));
         edtAmount.setInputType(InputType.TYPE_CLASS_NUMBER | InputType.TYPE_NUMBER_FLAG_DECIMAL);
         edtDate.setText(budget.getDate());
+
+        // Hiển thị DatePicker khi nhấn vào EditText hoặc biểu tượng lịch
+        View.OnClickListener dateClickListener = v -> {
+            Calendar calendar = Calendar.getInstance();
+            DatePickerDialog datePickerDialog = new DatePickerDialog(
+                    getContext(),
+                    (view, year, month, dayOfMonth) -> {
+                        String selectedDate = String.format(Locale.getDefault(), "%04d-%02d-%02d", year, month + 1, dayOfMonth);
+                        edtDate.setText(selectedDate);
+                    },
+                    calendar.get(Calendar.YEAR),
+                    calendar.get(Calendar.MONTH),
+                    calendar.get(Calendar.DAY_OF_MONTH)
+            );
+            datePickerDialog.show();
+        };
+
+        edtDate.setOnClickListener(dateClickListener);
+        imgCalendar.setOnClickListener(dateClickListener);
 
         new AlertDialog.Builder(getContext())
                 .setTitle("Edit Budget")
                 .setView(dialogView)
                 .setPositiveButton("Save", (dialog, which) -> {
-                    String newCategory = edtCategory.getText().toString();
+                    String newCategory = spinnerCategory.getSelectedItem().toString();
                     String newDate = edtDate.getText().toString();
                     double newAmount = Double.parseDouble(edtAmount.getText().toString());
 
