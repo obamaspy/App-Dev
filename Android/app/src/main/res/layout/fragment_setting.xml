@@ -81,6 +81,13 @@
                 android:textSize="16sp"/>
         </LinearLayout>
 
+        <Switch
+            android:id="@+id/switchDarkMode"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Dark Mode"
+            android:layout_marginTop="20dp" />
+
         <!-- Logout Button -->
         <Button
             android:id="@+id/btnLogout"

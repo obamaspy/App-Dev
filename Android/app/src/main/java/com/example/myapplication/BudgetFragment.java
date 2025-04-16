@@ -19,6 +19,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.example.myapplication.Adapter.BudgetAdapter;
 import com.example.myapplication.database.BudgetDB;
 import com.example.myapplication.model.BudgetModel;
+
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.util.ArrayList;
@@ -57,12 +58,21 @@ public class BudgetFragment extends Fragment {
 
             @Override
             public void onDeleteClick(BudgetModel budget) {
-                budgetDB.deleteBudget(budget.getId());
-                totalBudget -= budget.getMoney();
-                saveBudgetToPrefs();
-                updateBudgetDisplay();
-                loadBudgets();
-                Toast.makeText(getContext(), "Budget deleted.", Toast.LENGTH_SHORT).show();
+                double totalExpenses = budgetDB.getTotalExpenses();
+                if (totalExpenses > 0) {
+                    new AlertDialog.Builder(getContext())
+                            .setTitle("Delete Budget Item")
+                            .setMessage("You have existing expenses. Please delete all expenses before deleting any budget.")
+                            .setPositiveButton("OK", null)
+                            .show();
+                } else {
+                    budgetDB.deleteBudget(budget.getId());
+                    totalBudget -= budget.getMoney();
+                    saveBudgetToPrefs();
+                    updateBudgetDisplay();
+                    loadBudgets();
+                    Toast.makeText(getContext(), "Budget deleted.", Toast.LENGTH_SHORT).show();
+                }
             }
         });
 
@@ -77,13 +87,23 @@ public class BudgetFragment extends Fragment {
         });
 
         btnDeleteBudget.setOnClickListener(v -> {
-            budgetDB.clearAllBudgets();
-            budgetList.clear();
-            budgetAdapter.notifyDataSetChanged();
-            totalBudget = 0;
-            saveBudgetToPrefs();
-            updateBudgetDisplay();
-            Toast.makeText(getContext(), "All budgets deleted.", Toast.LENGTH_SHORT).show();
+            double totalExpenses = budgetDB.getTotalExpenses();
+
+            if (totalExpenses > 0) {
+                new AlertDialog.Builder(getContext())
+                        .setTitle("Delete Budget")
+                        .setMessage("You have existing expenses. Please delete all expenses before deleting the budget.")
+                        .setPositiveButton("OK", null)
+                        .show();
+            } else {
+                budgetDB.clearAllBudgets();
+                budgetList.clear();
+                budgetAdapter.notifyDataSetChanged();
+                totalBudget = 0;
+                saveBudgetToPrefs();
+                updateBudgetDisplay();
+                Toast.makeText(getContext(), "All budgets deleted.", Toast.LENGTH_SHORT).show();
+            }
         });
 
         return view;
@@ -96,13 +116,11 @@ public class BudgetFragment extends Fragment {
         EditText edtDate = dialogView.findViewById(R.id.edtDate);
         ImageView imgCalendar = dialogView.findViewById(R.id.imgCalendar);
 
-        // Thiết lập dữ liệu cho Spinner
         String[] categories = {"Family support", "Scholarship", "Overtime pay"};
         ArrayAdapter<String> adapter = new ArrayAdapter<>(requireContext(), android.R.layout.simple_spinner_item, categories);
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         spinnerCategory.setAdapter(adapter);
 
-        // Chọn vị trí danh mục hiện tại
         int selectedIndex = 0;
         for (int i = 0; i < categories.length; i++) {
             if (categories[i].equalsIgnoreCase(budget.getName())) {
@@ -116,7 +134,6 @@ public class BudgetFragment extends Fragment {
         edtAmount.setInputType(InputType.TYPE_CLASS_NUMBER | InputType.TYPE_NUMBER_FLAG_DECIMAL);
         edtDate.setText(budget.getDate());
 
-        // Hiển thị DatePicker khi nhấn vào EditText hoặc biểu tượng lịch
         View.OnClickListener dateClickListener = v -> {
             Calendar calendar = Calendar.getInstance();
             DatePickerDialog datePickerDialog = new DatePickerDialog(

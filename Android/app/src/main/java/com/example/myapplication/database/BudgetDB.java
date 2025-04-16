@@ -19,7 +19,7 @@ import java.util.List;
 public class BudgetDB extends SQLiteOpenHelper {
     private static final String DB_NAME = "campus_expenses";
     private static final String DB_TABLE = "budgets";
-    private static final int DB_VERSION = 27;
+    private static final int DB_VERSION = 30;
 
     // Cột trong database
     private static final String ID_COL = "id";

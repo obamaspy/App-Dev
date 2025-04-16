@@ -79,6 +79,12 @@ public class SignUpActivity extends AppCompatActivity {
                     return;
                 }
 
+                // Kiểm tra độ mạnh mật khẩu
+                if (!isStrongPassword(password)) {
+                    edtPassword.setError("Password must contain special characters, uppercase letters, lowercase letters, numbers, and be at least 8 characters long.");
+                    return;
+                }
+
                 String email = edtEmail.getText().toString().trim();
                 if (TextUtils.isEmpty(email)) {
                     edtEmail.setError("Email not empty");
@@ -107,6 +113,12 @@ public class SignUpActivity extends AppCompatActivity {
                 }
             }
         });
+    }
+
+    // Hàm kiểm tra độ mạnh mật khẩu
+    private boolean isStrongPassword(String password) {
+        String passwordPattern = "^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[@#$%^&+=!(){}\\[\\]:;\"'<>,.?/~_\\\\|-]).{8,}$";
+        return password.matches(passwordPattern);
     }
 
     // Optional: Ghi tài khoản vào file nếu muốn dùng cách khác
